@@ -24,7 +24,7 @@ class VoiceToText:
         self.app_id = "878af839"
         self.api_key = "76dd226877195c5258abc4744bd59858"
         #ffmpegpath
-        self.ffmpeg = 'C:/Users/26240/Desktop/python/DesktopPet/ffmpeg-master-latest-win64-gpl/bin/ffmpeg.exe'
+        self.ffmpeg = './ffmpeg-master-latest-win64-gpl/bin/ffmpeg.exe'
         #temp file_path
         self.wav_path ="./output.wav"
         self.pcm_path = "./output.pcm"
