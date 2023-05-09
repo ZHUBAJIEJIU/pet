@@ -12,6 +12,7 @@ from desktop_pet.pet_theme import PetTheme
 
 from voice_to_text import VoiceToText
 from text_to_speech import TextToSpeech
+from baidu_tts import BaiduTTS
 from music_play import MusicPlayer
 size = [32,32]
 class ProcChat(QObject):
@@ -22,7 +23,7 @@ class PetChat(QWidget):
     def __init__(self, setting: ParamDB, parent=None, **kwargs):
         super(PetChat, self).__init__(parent)
         self.setting = setting
-        self.tts = TextToSpeech()
+        self.tts = BaiduTTS()
         self.vtt = VoiceToText()
         self.music_player =MusicPlayer()
         self.voice_text = ""
