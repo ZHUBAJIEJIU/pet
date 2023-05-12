@@ -2,7 +2,7 @@ import sys
 import threading
 
 from PyQt6 import QtCore, QtGui
-from PyQt6.QtCore import QThread, Qt, pyqtSignal, QObject, QPoint
+from PyQt6.QtCore import QThread, Qt, pyqtSignal, QObject, QPoint, QTimer
 from PyQt6.QtGui import QColor, QPixmap, QPalette, QBitmap, QPainter, QMouseEvent
 from PyQt6.QtWidgets import *
 
@@ -57,17 +57,26 @@ class PetChat(QWidget):
 
         # self.show_msg_widget = QListWidget(self)
         self.show_msg_widget = QTableWidget(self)
-        self.send_msg_widget = QLineEdit()
+        self.send_msg_widget = QLineEdit(self)
 
         self.send_msg_button = QPushButton('发送')
         self.clear_msg_button = QPushButton('清除')
         self.voice_to_text_button = QPushButton('录音')
+        self.quit_btn = QPushButton("退出")
+        
         self.msg_signal = ProcChat()
         self.msg_signal.bg_proc.connect(self.add_msg)
+        
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.on_long_press)
 
         self.init_ui()
 
         self.init_chat()
+        
+        # self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        self.grabKeyboard()
+
 
     def init_chat(self):
         tmp_result_text = "waiting..."
@@ -138,8 +147,12 @@ class PetChat(QWidget):
         self.voice_to_text_button.setStyleSheet("background-color:#d6ecf0;border-radius:5px")
         self.voice_to_text_button.pressed.connect(self.voice_to_text_begin)
         self.voice_to_text_button.released.connect(self.voice_to_text_end)
-        # self.voice_to_text_button.clicked.connect(self.send_voice_to_msg)
         h_box.addWidget(self.voice_to_text_button)
+        
+        self.quit_btn.setFixedWidth(50)
+        self.quit_btn.setStyleSheet("background-color:#d6ecf0;border-radius:5px")
+        self.quit_btn.clicked.connect(QApplication.instance().quit)
+        h_box.addWidget(self.quit_btn)
 
 
         vbox.addLayout(h_box)
@@ -167,7 +180,7 @@ class PetChat(QWidget):
             self.send_msg_widget.setDisabled(False)
             self.voice_to_text_button.setDisabled(False)
             self.clear_msg_button.setDisabled(False)
-            self.send_msg_widget.setFocus()
+            # self.send_msg_widget.setFocus()
         else:
             self.show_msg_widget.insertRow(row_count)
         # 设置图标
@@ -315,6 +328,17 @@ class PetChat(QWidget):
         self.tts.text_to_speech("录音转换中",self.music_player.player)
         self.voice_text = self.vtt.send_to_client()
         self.send_msg_widget.setText(self.voice_text)
+        
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Space:
+            self.timer.start(500)
+    
+    def keyReleaseEvent(self, event):
+        if event.key() == Qt.Key.Key_Space: 
+            self.timer.stop()
+    
+    def on_long_press(self):
+        print('Long press!')
 
 
 if __name__ == '__main__':
