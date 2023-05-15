@@ -26,8 +26,8 @@ class DesktopPet(QWidget):
         # 一些暂定参数
         self.width = int(self.setting.setting_get("main_win_width"))
         self.height = int(self.setting.setting_get("main_win_height"))
-        self.width = 800
-        self.height = 700
+        self.width = 128
+        self.height = 128
         # 一些暂存变量
         self.drag_s_pos = None
 
@@ -39,7 +39,7 @@ class DesktopPet(QWidget):
 
         # setting
         self.ui_setting = UISetting(self.setting)
-        print(self.width,self.height)
+        print(self.width, self.height)
         
 
         self.show()

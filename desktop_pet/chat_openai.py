@@ -25,7 +25,7 @@ class OpenAIChat:
     def ask(self, messages):
         # print(messages)
         if self.use_test:
-            return "不要回答！！！不要回答！！！不要回答！！！", True
+            return "测试", True
         else:
             try:
                 response = openai.ChatCompletion.create(

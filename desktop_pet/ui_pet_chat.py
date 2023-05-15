@@ -66,9 +66,6 @@ class PetChat(QWidget):
         
         self.msg_signal = ProcChat()
         self.msg_signal.bg_proc.connect(self.add_msg)
-        
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.on_long_press)
 
         self.init_ui()
 
@@ -244,35 +241,7 @@ class PetChat(QWidget):
         self.send_msg_widget.setDisabled(True)
         self.clear_msg_button.setDisabled(True)
         self.voice_to_text_button.setDisabled(True)
-    # def send_voice_to_msg(self):
-    #     line_content = self.voice_text
-    #     if line_content is None or line_content == "":
-    #         return
-    #     # self.send_msg_widget.text =
-    #     # self.send_msg_widget.clear()
 
-    #     if self.setting.setting_get("chat_single_item") == "True" and len(self.chat_messages) > 2:
-    #         self.chat_messages.pop()
-    #         self.chat_messages.pop()
-
-    #     if line_content == "quit" or line_content == "exit" or line_content == "q":
-    #         self.hide()
-    #         return
-    #     self.add_msg(self.me_suffix, self.theme.load_pixmap("icon_chat_me", size=size), line_content, left=False)
-
-    #     # 生成问答对话
-    #     self.chat_messages.append({"role": "user", "content": line_content})
-
-    #     tmp_result_text = "waiting..."
-    #     self.add_msg(self.ai_prefix, self.theme.load_pixmap("icon_chat_ai", size=size), tmp_result_text, left=True)
-    #     self.show_msg_widget.scrollToBottom()
-    #     # _thread.start_new_thread(self.bg_proc, ())
-    #     thread_bg = threading.Thread(target=PetChat.bg_proc, args=(self,))
-    #     thread_bg.start()
-    #     self.send_msg_button.setDisabled(True)
-    #     self.send_msg_widget.setDisabled(True)
-    #     self.clear_msg_button.setDisabled(True)
-    #     self.voice_to_text_button.setDisabled(True)
 
     def clear_msg(self):
         if self.setting.setting_get("chat_single_item") == "True":
@@ -314,8 +283,9 @@ class PetChat(QWidget):
     def voice_to_text_end(self):
         self.record = False
         self.vtt.record_end()
-        thread =  threading.Thread(target=self.thread_send_to_client)
-        thread.start()
+        # thread =  threading.Thread(target=self.thread_send_to_client)
+        # thread.start()
+        self.thread_send_to_client()
         # print(self.voice_text)
 
     def thread_recording(self) :
@@ -328,17 +298,17 @@ class PetChat(QWidget):
         self.tts.text_to_speech("录音转换中",self.music_player.player)
         self.voice_text = self.vtt.send_to_client()
         self.send_msg_widget.setText(self.voice_text)
+        self.send_msg()
         
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key.Key_Space:
-            self.timer.start(500)
+        # print(f'keyPressEvent.isAutoRepeat(): {event.isAutoRepeat()}')
+        if event.key() == Qt.Key.Key_Space and not event.isAutoRepeat():
+            self.voice_to_text_begin()
     
     def keyReleaseEvent(self, event):
-        if event.key() == Qt.Key.Key_Space: 
-            self.timer.stop()
-    
-    def on_long_press(self):
-        print('Long press!')
+        # print(f'keyReleaseEvent.isAutoRepeat(): {event.isAutoRepeat()}')
+        if event.key() == Qt.Key.Key_Space and not event.isAutoRepeat(): 
+            self.voice_to_text_end()
 
 
 if __name__ == '__main__':
