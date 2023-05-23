@@ -10,6 +10,9 @@ from desktop_pet.pet_theme import PetTheme
 from desktop_pet.ui_setting import UISetting
 from music_play import MusicPlayer
 
+import traceback
+
+
 class DesktopPet(QWidget):
     def __init__(self, parent=None, **kwargs):
         super(DesktopPet, self).__init__(parent)
@@ -26,21 +29,20 @@ class DesktopPet(QWidget):
         # 一些暂定参数
         self.width = int(self.setting.setting_get("main_win_width"))
         self.height = int(self.setting.setting_get("main_win_height"))
-        self.width = 128
-        self.height = 128
+        self.width = 512
+        self.height = 512
         # 一些暂存变量
         self.drag_s_pos = None
-
-        # 初始化UI
-        self.init_ui()
 
         # chat
         self.ui_chat = PetChat(self.setting)
 
         # setting
         self.ui_setting = UISetting(self.setting)
-        print(self.width, self.height)
+        # print(self.width, self.height)
         
+        # 初始化UI
+        self.init_ui()
 
         self.show()
 
@@ -63,22 +65,28 @@ class DesktopPet(QWidget):
         # 主窗口UI图像
         self.main_ui = QLabel(self)
         self.load_theme_main(count=0)
+        
+        self.ui_chat.c.switch2listen.connect(lambda: self.load_theme_main(count=1))
+        self.ui_chat.tts.c.switch2say.connect(lambda: self.load_theme_main(count=2))
+        # self.ui_chat.c.switch2wait.connect(lambda: self.load_theme_main(count=0))
+        self.ui_chat.tts.c.switch2wait.connect(lambda: self.load_theme_main(count=0))
+
 
     def load_theme_main(self, count):
-        main_ui_image = self.theme.load_pixmap(image_type="main_"+str(count), size=[self.width, self.height])
+        # main_ui_image = self.theme.load_pixmap(image_type="main_"+str(count), size=[self.width, self.height])
+        # if main_ui_image is not None:
+        #     # print("main ui setPixmap")
+        #     self.main_ui.setPixmap(main_ui_image)
+        #     return True
+        # else:
+        main_ui_image = self.theme.load_movie(image_type="main_"+str(count), size=[self.width, self.height])
         if main_ui_image is not None:
-            # print("main ui setPixmap")
-            self.main_ui.setPixmap(main_ui_image)
+            # print("main ui setMovie")
+            self.main_ui.setMovie(main_ui_image)
             return True
         else:
-            main_ui_image = self.theme.load_movie(image_type="main_"+str(count), size=[self.width, self.height])
-            if main_ui_image is not None:
-                # print("main ui setMovie")
-                self.main_ui.setMovie(main_ui_image)
-                return True
-            else:
-                # print("main_ui not found")
-                return False
+            # print("main_ui not found")
+            return False
 
     def mousePressEvent(self, a0: QtGui.QMouseEvent) -> None:
         # print(e.type().DragEnter)
@@ -168,6 +176,9 @@ class DesktopPet(QWidget):
 
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    pet = DesktopPet()
-    sys.exit(app.exec())
+    try:
+        app = QApplication(sys.argv)
+        pet = DesktopPet()
+        sys.exit(app.exec())
+    except Exception as e:
+        traceback.print_exc()

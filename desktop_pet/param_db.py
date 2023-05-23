@@ -60,7 +60,7 @@ class ParamDB:
         elif set_key == "openai_role":
             set_value = "AI助理"
         elif set_key == "openai_character":
-            set_value = "可爱,单纯"
+            set_value = "可爱, 话少"
         elif set_key == "openai_proxy":
             set_value = "http://127.0.0.1:8080"
         elif set_key == "chat_ai_prefix":

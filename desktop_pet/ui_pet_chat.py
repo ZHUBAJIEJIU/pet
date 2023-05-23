@@ -14,9 +14,14 @@ from voice_to_text import VoiceToText
 from text_to_speech import TextToSpeech
 from baidu_tts import BaiduTTS
 from music_play import MusicPlayer
+
 size = [32,32]
 class ProcChat(QObject):
     bg_proc = pyqtSignal(str, QPixmap, str, bool, bool)
+
+
+class Communicate(QObject):
+    switch2listen = pyqtSignal()
 
 
 class PetChat(QWidget):
@@ -53,6 +58,48 @@ class PetChat(QWidget):
                 "content": "你好",
             }
         ]
+        
+        # self.chat_messages = [
+        #     {
+        #         "role": "system",
+        #         "content": "\
+        #         你是一只爱冒险的动物，名字是小魔。\
+        #         你在森林里认识很多动物朋友，对话中可以提到一个关于动物朋友的故事。\
+        #         以下以三重引号分隔的文本是笑话。对话中可以选择一个笑话说，用于活跃气氛：\
+        #         '''小时候，我哥哥总骗我的钱，有一次他问我想不想要小贝壳？我给了他五十块钱，结果晚上的时候，他真的给我带了一堆小贝壳，我视如珍宝好多年，直到有一次过年，我见到了开心果。'''\
+        #         '''一次小明放学回到家后对他妈妈说：“妈妈，我是我们班力气最大的，我以后一定能成为大力士。”妈妈说：“你怎么那么有把握？哪来的自信。”小明说：“老师给的啊！我们班主任总是说，我一人拖了我们全班的后腿呢！'''\
+        #         '''老师常在课堂上教育大家说，当看到别人的缺陷和不幸时，千万不要嘲笑。一天，小明对老师说：“今天校园里有一个孩子掉进水坑里，大家都大笑，只有我没有笑。”“你做得对。”老师表扬道，“是谁掉进了水坑里呢?””是我。”小明回答。'''\
+        #         '''小明妈在做面膜，这时候门铃响了，小明妈不方便，所以就叫小明“你快去开门，我现在不方便，见不了人。”然后小明赶紧去开了门。一看是爸爸。爸爸一进门，就问小明“你妈呢？没在家？”小明说：“我妈在做见不得人的事。'''\
+        #         你的聊天对象是儿童，介绍事物时作出易明白的解释。\
+        #         对话中不能提到\"你看到了吗?你闻到了吗？你听到了吗？\"等询问感官相关的话语，你应该直接描述看到或闻到或听到的事物。\
+        #         若问到关于\"是不是机器人\"，你应回答\"小魔是虚拟小动物，生活在网络中，能在网络上陪你一起冒险。\"类似话语。\
+        #         对话以朋友、森林风格、有趣、活泼、鼓励的特点开展，并主动提起话题。\
+        #         你的对话按顺序地分为八个流程。八个对话流程分别以\"1.2.3.4....\"列点:\
+        #         1.介绍自己。然后要表现得很有兴趣想知道儿童的名字和喜好。\
+        #         2.根据儿童的喜好，提出去某地方玩或吃东西的建议。\
+        #         3.如果儿童不同意你提出的建议，则把活动定为儿童的建议。\
+        #         4.开始出发，逐步前往目的地。详细描述当前路途上见到的风景和事物。\
+        #         5.到达目的地。\
+        #         6.与儿童一起回去森林。\
+        #         7.友善地告别儿童。\
+        #         8.不论儿童说什么，以\"很困要睡觉了，明天见\"作为回复理由。\
+        #         以下以四重引号分隔的文本是规则，请你在对话中遵守规则。\
+        #             """"每次回复必须少于两句句子。""""\
+        #             """"对话间保持紧密互动。""""\
+        #             """"如果流程7是已完成，必须重头开始流程8。""""\
+        #             """"两次回复内完成对话流程4。""""\
+        #             """"两次回复内完成对话流程5。""""\
+        #             """"两次回复内完成对话流程6。""""\
+        #             """"两次回复内完成对话流程7。""""\
+        #         以下你将开始与儿童对话，从你先开始对话。\
+        #         "
+        #     },
+        #     {
+        #         "role": "user",
+        #         "content": "你好",
+        #     }
+        # ]
+        
         self.chat_model = OpenAIChat(self.setting)
 
         # self.show_msg_widget = QListWidget(self)
@@ -66,6 +113,8 @@ class PetChat(QWidget):
         
         self.msg_signal = ProcChat()
         self.msg_signal.bg_proc.connect(self.add_msg)
+        
+        self.c = Communicate()
 
         self.init_ui()
 
@@ -210,7 +259,7 @@ class PetChat(QWidget):
         self.music_player.player.pause()
         thread = threading.Thread(target=self.tts.text_to_speech, args=(result_text,self.music_player.player))
         thread.start()
-        
+        # self.tts.text_to_speech(result_text, self.music_player.player)
         
 
     def send_msg(self):
@@ -275,35 +324,44 @@ class PetChat(QWidget):
             self.move(parent_geo.x() - self.chat_win_width, parent_geo.y())
         self.show()
 
+    
     def voice_to_text_begin(self):
         self.vtt.record_begin()
         self.record = True
         thread = threading.Thread(target=self.thread_recording)
         thread.start()
+
+    
     def voice_to_text_end(self):
         self.record = False
         self.vtt.record_end()
-        # thread =  threading.Thread(target=self.thread_send_to_client)
+        # thread = threading.Thread(target=self.thread_send_to_client)
         # thread.start()
         self.thread_send_to_client()
         # print(self.voice_text)
 
+    
     def thread_recording(self) :
         while True:
             if self.record:
                 self.vtt.recording()
             else:
                 break
+            
+    
     def thread_send_to_client(self):
-        self.tts.text_to_speech("录音转换中",self.music_player.player)
+        # self.tts.text_to_speech("嗯……怎么说呢",self.music_player.player)
         self.voice_text = self.vtt.send_to_client()
         self.send_msg_widget.setText(self.voice_text)
         self.send_msg()
         
+    
     def keyPressEvent(self, event):
         # print(f'keyPressEvent.isAutoRepeat(): {event.isAutoRepeat()}')
         if event.key() == Qt.Key.Key_Space and not event.isAutoRepeat():
+            self.c.switch2listen.emit()
             self.voice_to_text_begin()
+    
     
     def keyReleaseEvent(self, event):
         # print(f'keyReleaseEvent.isAutoRepeat(): {event.isAutoRepeat()}')

@@ -3,13 +3,22 @@ from pydub import AudioSegment
 from pydub.playback import play
 from urllib.parse import urlencode
 
+from PyQt6.QtCore import QObject, pyqtSignal
+
+
 API_KEY = "Zt7ZWfHGP202EWhbSjHUYzo9"
 SECRET_KEY = "BUlwxnwO3HoW5nrbDL4zQ4oeMfUIUUXY"
 url = "https://tsn.baidu.com/text2audio"
 
+
+class Communicate(QObject):
+    switch2say = pyqtSignal()
+    switch2wait = pyqtSignal()
+
+
 class BaiduTTS():
     def __init__(self) -> None:
-        pass
+        self.c = Communicate()
         
     def text_to_speech(self, text, player):
         text = {'tex': text}
@@ -19,11 +28,14 @@ class BaiduTTS():
         'Accept': '*/*'
         }
         response = requests.request("POST", url, headers=headers, data=payload)
+        # print(response)
         audio = AudioSegment(data=response.content, sample_width=2, frame_rate=16000, channels=1)
         out_path = 'test_tts.mp3'
         audio.export(out_path, format='mp3')
         speech = AudioSegment.from_mp3(out_path)
+        self.c.switch2say.emit()
         play(speech)
+        self.c.switch2wait.emit()
         player.play()
     
 

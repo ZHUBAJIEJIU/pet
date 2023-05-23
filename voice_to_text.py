@@ -10,10 +10,10 @@ from urllib.parse import quote
 import logging
 import pyaudio
 import wave
-import time
 from PySide6.QtWidgets import QPushButton
 import subprocess
 import os
+from format_trans import wav_to_pcm
 
 class VoiceToText:
     def __init__(self):
@@ -41,6 +41,7 @@ class VoiceToText:
                             frames_per_buffer=self.CHUNK)
         self.frames = []
         print("开始录音...")
+        
     def recording(self):
             data = self.stream.read(self.CHUNK)
             self.frames.append(data)
@@ -60,13 +61,20 @@ class VoiceToText:
         self.stream.stop_stream()
         self.stream.close()
         self.audio.terminate()
-        print("录音时间为：", self.run_time, "秒")
+        # print("录音时间为：", round(self.run_time, 3), "秒")
+        print(123)
+        
         # 音频文件转换(win)
         # 执行命令，将输出打印到控制台
         
         # process = subprocess.Popen(["cmd", "/c", self.ffmpeg, "-i", self.wav_path, "-f s16le -acodec pcm_s16le -ar 16000 -ac 1",self.pcm_path ,"-y"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # stdout, stderr = process.communicate()
-        os.system(f'{self.ffmpeg} -i {self.wav_path} -f s16le -acodec pcm_s16le -ar 16000 -ac 1 {self.pcm_path} -loglevel quiet -y')
+        try:
+            # os.system(f'{self.ffmpeg} -i {self.wav_path} -f s16le -acodec pcm_s16le -ar 16000 -ac 1 {self.pcm_path} -loglevel quiet -y')
+            print(456)
+            wav_to_pcm(self.wav_path, self.pcm_path)
+        except:
+            print('wav2pcm失败')
         
 
     def send_to_client(self):
@@ -160,90 +168,3 @@ class Client():
     def close(self):
         self.ws.close()
         print("connection closed")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def voice_to_text(seconds):
-    RECORD_SECONDS = seconds
-    # 创建PyAudio对象   
-    audio = pyaudio.PyAudio()
-
-    # 打开麦克风设备
-    stream = audio.open(format=FORMAT, channels=CHANNELS,
-                        rate=RATE, input=True,
-                        frames_per_buffer=CHUNK)
-
-    print("开始录音...")
-
-    # 录制音频数据
-    frames = []
-    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-        data = stream.read(CHUNK)
-        frames.append(data)
-
-    print("录音结束。")
-
-    # 停止录制音频数据
-    stream.stop_stream()
-    stream.close()
-    audio.terminate()
-
-    # 将录制的音频数据保存为WAV文件
-    wf = wave.open("output.wav", 'wb')
-    wf.setnchannels(CHANNELS)
-    wf.setsampwidth(audio.get_sample_size(FORMAT))
-    wf.setframerate(RATE)
-    wf.writeframes(b''.join(frames))
-    wf.close()
-
-    # 音频文件转换(win)
-    import subprocess
-
-    # 执行命令，将输出打印到控制台
-    # result = subprocess.run('ls', capture_output=True, text=True)
-    process = subprocess.Popen(["cmd", "/c", ffmpeg, "-i", wav_path, "-f", "s16le", "-acodec", "pcm_s16le", "-ar", "16000", "-ac", "1",pcm_path ,"-y"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    # print(stdout.decode('gbk'))
-    # print(stderr.decode('gbk'))
-
-    # 音频文件转换
-    # from pydub import AudioSegment
-    # print(AudioSegment.converter)
-    # AudioSegment.converter = './ffmpeg-master-latest-win64-gpl/bin'
-
-    # 将wav文件转换为mp3格式
-    # sound = AudioSegment.from_file("./output.wav",format='wav')
-    # sound = sound.set_frame_rate(16000).set_channels(1)
-    # sound.export("./outputsf.pcm", format="s16le")
-
-    #语音转文字
-    logging.basicConfig()
-
-    client = Client()
-    file_path = pcm_path
-
-    client.send(file_path)
-    # client.send(file_path)
-    # client.close()
-    try:
-        words = ''
-        # print(json.loads(client.data))
-        for i in json.loads(client.data['data'])['cn']['st']['rt'][0]['ws']:
-            # print(i['cw'][0]['w'])
-            words += i['cw'][0]['w']
-        return words
-    except:
-        print('Nothing Repeat!')
-

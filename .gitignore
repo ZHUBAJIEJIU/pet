@@ -4,3 +4,8 @@ param_db
 build/
 dist/
 param_db_bak
+*.pcm
+*.wav
+*.mp3
+*_test.py
+*.gif

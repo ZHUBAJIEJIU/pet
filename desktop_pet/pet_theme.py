@@ -36,7 +36,7 @@ class PetTheme:
         if os.path.exists(image_path):
             movie = QMovie(image_path)
         else:
-            print("load_movie path is error, ", image_path)
+            # print("load_movie path is error, ", image_path)
             return None
         if size is not None and movie is not None:
             movie.setCacheMode(QMovie.CacheMode.CacheAll)
