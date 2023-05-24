@@ -176,9 +176,6 @@ class DesktopPet(QWidget):
 
 
 if __name__ == '__main__':
-    try:
-        app = QApplication(sys.argv)
-        pet = DesktopPet()
-        sys.exit(app.exec())
-    except Exception as e:
-        traceback.print_exc()
+    app = QApplication(sys.argv)
+    pet = DesktopPet()
+    sys.exit(app.exec())

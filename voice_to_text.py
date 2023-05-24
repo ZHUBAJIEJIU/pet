@@ -30,7 +30,6 @@ class VoiceToText:
         #temp file_path
         self.wav_path ="./output.wav"
         self.pcm_path = "./output.pcm"
-        #
 
     def record_begin(self):
         self.audio = pyaudio.PyAudio()
@@ -47,8 +46,8 @@ class VoiceToText:
             self.frames.append(data)
 
     def record_end(self):
-        self.end_time = time.time()
-        self.run_time = self.end_time - self.start_time
+        # self.end_time = time.time()
+        # self.run_time = self.end_time - self.start_time
         # 将录制的音频数据保存为WAV文件
         wf = wave.open(self.wav_path, 'wb')
         wf.setnchannels(self.CHANNELS)
@@ -69,12 +68,9 @@ class VoiceToText:
         
         # process = subprocess.Popen(["cmd", "/c", self.ffmpeg, "-i", self.wav_path, "-f s16le -acodec pcm_s16le -ar 16000 -ac 1",self.pcm_path ,"-y"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # stdout, stderr = process.communicate()
-        try:
-            # os.system(f'{self.ffmpeg} -i {self.wav_path} -f s16le -acodec pcm_s16le -ar 16000 -ac 1 {self.pcm_path} -loglevel quiet -y')
-            print(456)
-            wav_to_pcm(self.wav_path, self.pcm_path)
-        except:
-            print('wav2pcm失败')
+        # os.system(f'{self.ffmpeg} -i {self.wav_path} -f s16le -acodec pcm_s16le -ar 16000 -ac 1 {self.pcm_path} -loglevel quiet -y')
+        print(456)
+        wav_to_pcm(self.wav_path, self.pcm_path)
         
 
     def send_to_client(self):

@@ -6,8 +6,11 @@ from urllib.parse import urlencode
 from PyQt6.QtCore import QObject, pyqtSignal
 
 
-API_KEY = "Zt7ZWfHGP202EWhbSjHUYzo9"
-SECRET_KEY = "BUlwxnwO3HoW5nrbDL4zQ4oeMfUIUUXY"
+# API_KEY = "Zt7ZWfHGP202EWhbSjHUYzo9"
+# SECRET_KEY = "BUlwxnwO3HoW5nrbDL4zQ4oeMfUIUUXY"
+API_KEY = "oOw2vZapzFRnQBvD05uAFKII"
+SECRET_KEY = "E7jdKGPtKFI1VwKPkPsTFgxh6lLVoBzS"
+
 url = "https://tsn.baidu.com/text2audio"
 
 
