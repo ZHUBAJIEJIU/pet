@@ -8,6 +8,7 @@ class MusicPlayer(QWidget):
         # 创建音乐播放器
         self.player = QMediaPlayer(self)
         self.audio = QAudioOutput()
+        self.audio.setVolume(0.1)
         self.player.setAudioOutput(self.audio)
         self.fileName = './HOYO_back.mp3'
         self.player.setSource(QUrl.fromLocalFile(self.fileName))
